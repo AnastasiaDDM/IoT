@@ -85,3 +85,70 @@ void printDigits(int digits){
 }
 ```
 
+# Задание 2
+## Цель работы
+Проектирование относительно недорогой конкурентоспособной системы управления освещением мест общего пользования жилого дома.
+
+## Исходные данные
+**Место эксплуатации системы:** подъезд и лестничные площадки 5-ти этажного дома.
+
+**Сценарий**: необходимо организовать два режима работы дневной и ночной. В ночном режиме свет включается на всех лестничных площадках при наличии людей в подъезде, например, когда человек заходит в подъезд или выходит из квартиры. После того, как человек выйдет из подъезда или зайдет в квартиру, свет должен гаснуть через 10 сек (при моделировании в Proteus лучше уста-новить меньшее время, около 0,5 с). В дневное время свет включается только на первом этаже при входе в подъезд, так же при наличии людей. На меж-этажных площадках имеются окна и дневного освещения достаточно.
+
+
+## Схема Proteus
+![Схема Задание 2](imgs/task-21.png)
+
+## Скетч Arduino
+```
+int lightD1 = 0;
+int lightD25 = 13;
+int movePinD1 = 1;
+int movePinD2 = 2;
+int movePinD3 = 4;
+int movePinD4 = 7;
+int movePinD5 = 8;
+
+int lightValue = 0;
+int brightConst = 300; //контстанта освещённости
+void setup() {
+
+  pinMode (lightD1, OUTPUT);
+  pinMode (lightD25, OUTPUT);
+  pinMode (movePinD1, INPUT);
+  pinMode (movePinD2, INPUT);
+  pinMode (movePinD3, INPUT);
+  pinMode (movePinD4, INPUT);
+  pinMode (movePinD5, INPUT);
+}
+void loop() {
+  lightValue = analogRead(A0);  
+  movePinD1 = digitalRead(1);
+  movePinD2 = digitalRead(2);
+  movePinD3 = digitalRead(4);
+  movePinD4 = digitalRead(7);
+  movePinD5 = digitalRead(8); 
+
+  if (lightValue < brightConst){
+    // День
+    if(movePinD1 == HIGH){
+        digitalWrite (lightD1, HIGH); //вкл
+        delay(500); //ожидание
+    }
+    else{
+      digitalWrite (lightD1, LOW); // выкл 1 светодиод 
+      digitalWrite (lightD25, LOW); // выкл 2 светодиод 
+    }
+  }
+  else{
+    // Ночь 
+    if(movePinD1 == HIGH || movePinD2 == HIGH || movePinD3 == HIGH || movePinD4 == HIGH || movePinD5 == HIGH){
+        digitalWrite (lightD1, HIGH); // вкл 1 этаж
+        digitalWrite (lightD25, HIGH); // вкл  свет на 2-5 этажах
+        delay(500); //ожидание
+    }else{
+        digitalWrite (lightD1, LOW); 
+        digitalWrite (lightD25, LOW); 
+    }
+  }
+}
+```
